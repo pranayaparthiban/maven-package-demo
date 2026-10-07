@@ -1,21 +1,34 @@
 pipeline {
-agent any
-tools {
-maven 'Maven3'
-}
-stages {
-stage('Checkout') {
-steps {
-git branch: 'main', url: 'https://github.com/pranayaparthiban/maven-package-demo.git'
-}
-}
-stage('Package') {
-steps {
-bat 'mvn clean package'
-}
-}
-stage('Run JAR') {
-steps {
-bat 'java -cp target\\maven-package-demo-1.0.jar com.example.App'
-}
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Maven build completed successfully!'
+        }
+
+        failure {
+            echo 'Maven build failed!'
+        }
+    }
 }
